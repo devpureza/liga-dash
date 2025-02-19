@@ -6,17 +6,12 @@ st.set_page_config(page_title="Liga - Dashboard de eventos", page_icon=":books:"
 
 # Convertendo arquivo Excel para CSV
 df_excel = pd.read_excel("go-19022025.xlsx")
-df_excel.to_csv("teste.csv", index=False)
+df_excel.to_csv("infos_filtradas.csv", index=False)
 
-aula = pd.read_csv("teste.csv")
+csv = pd.read_csv("infos_filtradas.csv")
 
-
-# Limpando a coluna Valor (removendo R$ e convertendo para float)
-# aula['Valor'] = aula['Valor'].str.replace('R$', '').str.replace('.', '').str.replace(',', '.').astype(float)
-
-# Limpando a coluna Repasse (removendo R$ e convertendo para float)
-# aula['Repasse'] = aula['Repasse'].str.replace('R$', '').str.replace('.', '').str.replace(',', '.').astype(float)
-
+#logo na barra lateral
+st.logo("logo-white.png", size="large", link="https://www.deualiga.com.br")
 
 # Criando barra lateral para filtros
 st.sidebar.header("Filtros:")
@@ -30,7 +25,7 @@ mostrar_repasses = st.sidebar.checkbox("Mostrar Repasses por Atlética", value=T
 st.sidebar.divider()
 
 # Obtendo lista única de atléticas
-atleticas = aula['Nome da atlética'].unique()
+atleticas = csv['Nome da atlética'].unique()
 
 # Adicionando checkbox para selecionar todas
 selecionar_todas = st.sidebar.checkbox("Selecionar Todas", value=True)
@@ -47,7 +42,10 @@ if selecionar_todas:
     atleticas_selecionadas = atleticas
 
 # Filtrando o dataframe baseado na seleção
-df_filtrado = aula[aula['Nome da atlética'].isin(atleticas_selecionadas)]
+df_filtrado = csv[csv['Nome da atlética'].isin(atleticas_selecionadas)]
+# Criando DataFrame simplificado com dados selecionados
+df_dados = df_filtrado[['Nome da atlética','Nome do ingresso','Nome do lote', 'Nome do comprador', 'Valor do bilhete original', 'Valor do repasse']]
+
 
 # Contando o número de vendas por atlética
 vendas_por_atletica = df_filtrado['Nome da atlética'].value_counts().reset_index()
@@ -89,8 +87,37 @@ fig_repasses.update_layout(yaxis_title='Repasse Total')
 
 # Exibindo a tabela principal condicionalmente
 if mostrar_tabela:
-    st.write("### Tabela de Dados")
-    st.dataframe(df_filtrado)
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("### INTERMEDGO - 2025: últimas vendas")
+        st.dataframe(df_dados)
+    with col2:
+        top_3_vendas = vendas_por_atletica.head(7)
+        
+        st.markdown("""
+            <h3 style='color: #FFFFFF; text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);'>
+                🏆 Top vendas por atlética
+            </h3>
+        """, unsafe_allow_html=True)
+        
+        for i, row in top_3_vendas.iterrows():
+            medal = "🥇" if i == 0 else "🥈" if i == 1 else "🥉" if i == 2 else "🏅"
+            st.markdown(f"""
+                <div style='
+                    background-color: rgba(30,136,229,0.1);
+                    padding: 10px;
+                    border-radius: 10px;
+                    margin: 5px 0;
+                    border-left: 5px solid #1E88E5;
+                '>
+                    <p style='font-size: 16px; margin: 0;'>
+                        {medal} {row['Nome da atlética']} 
+                        <span style='float: right; font-weight: bold;'>
+                            {row['Número de Vendas']} vendas
+                        </span>
+                    </p>
+                </div>
+            """, unsafe_allow_html=True)
 
 # Exibindo os dois primeiros gráficos em colunas se estiverem habilitados
 if mostrar_ranking or mostrar_vendas:
