@@ -5,7 +5,7 @@ import plotly.express as px
 st.set_page_config(page_title="Aula", page_icon=":books:", layout="wide")
 
 # Convertendo arquivo Excel para CSV
-df_excel = pd.read_excel("intermedgo.xlsx")
+df_excel = pd.read_excel("go-19022025.xlsx")
 df_excel.to_csv("teste.csv", index=False)
 
 aula = pd.read_csv("teste.csv")
