@@ -1,49 +1,20 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from src.top_vendas_atleticas import ranking_atleticas
+from src.sidebar import filtros_sidebar
 
 st.set_page_config(page_title="Liga - Dashboard de eventos", page_icon=":books:", layout="wide")
 
-# Convertendo arquivo Excel para CSV
+# Converte arquivo excel em csv e le o arquivo csv
 df_excel = pd.read_excel("intermed19022025.xlsx")
 df_excel.to_csv("infos_filtradas.csv", index=False)
-
 csv = pd.read_csv("infos_filtradas.csv")
 
-#logo na barra lateral
-st.logo("logo-white.png", size="large", link="https://www.deualiga.com.br")
-
-# Criando barra lateral para filtros
-st.sidebar.header("Filtros:")
-
-# Adicionando checkboxes para controlar a visibilidade
-st.sidebar.header("Exibir/Ocultar Elementos:")
-mostrar_tabela = st.sidebar.checkbox("Mostrar Tabela de Dados", value=True)
-mostrar_ranking = st.sidebar.checkbox("Mostrar Ranking de Vendas", value=True)
-mostrar_vendas = st.sidebar.checkbox("Mostrar Vendas por Atlética", value=True)
-mostrar_repasses = st.sidebar.checkbox("Mostrar Repasses por Atlética", value=True)
-st.sidebar.divider()
-
-# Obtendo lista única de atléticas
-atleticas = csv['Nome da atlética'].unique()
-
-# Adicionando checkbox para selecionar todas
-selecionar_todas = st.sidebar.checkbox("Selecionar Todas", value=True)
+# Aplicando os filtros da sidebar
+df_filtrado, mostrar_tabela, mostrar_ranking, mostrar_vendas, mostrar_repasses = filtros_sidebar(csv)
 
 
-# Ajustando o multiselect baseado no checkbox
-atleticas_selecionadas = st.sidebar.multiselect(
-    "Selecione as Atléticas:",
-    options=atleticas,
-    default=atleticas if selecionar_todas else []
-)
-
-# Se o checkbox estiver marcado, seleciona todas as atléticas
-if selecionar_todas:
-    atleticas_selecionadas = atleticas
-
-# Filtrando o dataframe baseado na seleção
-df_filtrado = csv[csv['Nome da atlética'].isin(atleticas_selecionadas)]
 # Criando DataFrame simplificado com dados selecionados
 df_dados = df_filtrado[['Nome da atlética','Nome do ingresso','Nome do lote', 'Nome do comprador', 'Valor do bilhete original', 'Valor do repasse']]
 
@@ -92,33 +63,8 @@ if mostrar_tabela:
         st.write("### INTERMEDGO - 2025: últimas vendas")
         st.dataframe(df_dados)
     with col2:
-        top_3_vendas = vendas_por_atletica.head(7)
-        
-        st.markdown("""
-            <h3 style='color: #FFFFFF; text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);'>
-                🏆 Top vendas por atlética
-            </h3>
-        """, unsafe_allow_html=True)
-        
-        for i, row in top_3_vendas.iterrows():
-            medal = "🥇" if i == 0 else "🥈" if i == 1 else "🥉" if i == 2 else "🏅"
-            st.markdown(f"""
-                <div style='
-                    background-color: rgba(30,136,229,0.1);
-                    padding: 10px;
-                    border-radius: 10px;
-                    margin: 5px 0;
-                    border-left: 5px solid #1E88E5;
-                '>
-                    <p style='font-size: 16px; margin: 0;'>
-                        {medal} {row['Nome da atlética']} 
-                        <span style='float: right; font-weight: bold;'>
-                            {row['Número de Vendas']} vendas
-                        </span>
-                    </p>
-                </div>
-            """, unsafe_allow_html=True)
-            
+        ranking_atleticas(vendas_por_atletica)
+
 # Totalizadores de venda
 col1, col2, col3 = st.columns(3)
 
