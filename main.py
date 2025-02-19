@@ -79,7 +79,7 @@ with col1:
             border: 1px solid rgba(30,136,229,0.2);
             text-align: center;
         '>
-            <p style='color: #666; font-size: 14px; margin-bottom: 5px;'>💰 Total de Vendas</p>
+            <p style='color: #666; font-size: 14px; margin-bottom: 5px;'>💰 Total de Vendas <span style='font-size: 10px;'>(Considera repasse)</span></p>
             <p style='font-size: 24px; font-weight: bold; margin: 0;'>
                 R$ {total_vendas:,.2f}
             </p>
