@@ -30,6 +30,7 @@ atleticas = csv['Nome da atlética'].unique()
 # Adicionando checkbox para selecionar todas
 selecionar_todas = st.sidebar.checkbox("Selecionar Todas", value=True)
 
+
 # Ajustando o multiselect baseado no checkbox
 atleticas_selecionadas = st.sidebar.multiselect(
     "Selecione as Atléticas:",
@@ -45,7 +46,6 @@ if selecionar_todas:
 df_filtrado = csv[csv['Nome da atlética'].isin(atleticas_selecionadas)]
 # Criando DataFrame simplificado com dados selecionados
 df_dados = df_filtrado[['Nome da atlética','Nome do ingresso','Nome do lote', 'Nome do comprador', 'Valor do bilhete original', 'Valor do repasse']]
-
 
 # Contando o número de vendas por atlética
 vendas_por_atletica = df_filtrado['Nome da atlética'].value_counts().reset_index()
@@ -118,7 +118,65 @@ if mostrar_tabela:
                     </p>
                 </div>
             """, unsafe_allow_html=True)
+            
+# Totalizadores de venda
+col1, col2, col3 = st.columns(3)
 
+with col1:
+    total_vendas = df_filtrado['Valor do bilhete original'].sum()
+    st.markdown(f"""
+        <div style='
+            background-color: rgba(30,136,229,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 5px;
+            border: 1px solid rgba(30,136,229,0.2);
+            text-align: center;
+        '>
+            <p style='color: #666; font-size: 14px; margin-bottom: 5px;'>💰 Total de Vendas</p>
+            <p style='font-size: 24px; font-weight: bold; margin: 0;'>
+                R$ {total_vendas:,.2f}
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    total_repasse = df_filtrado['Valor do repasse'].sum()
+    st.markdown(f"""
+        <div style='
+            background-color: rgba(30,136,229,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 5px;
+            border: 1px solid rgba(30,136,229,0.2);
+            text-align: center;
+        '>
+            <p style='color: #666; font-size: 14px; margin-bottom: 5px;'>💸 Total de Repasse</p>
+            <p style='font-size: 24px; font-weight: bold; margin: 0;'>
+                R$ {total_repasse:,.2f}
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
+
+with col3:
+    qtd_vendas = len(df_filtrado)
+    st.markdown(f"""
+        <div style='
+            background-color: rgba(30,136,229,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 5px;
+            border: 1px solid rgba(30,136,229,0.2);
+            text-align: center;
+        '>
+            <p style='color: #666; font-size: 14px; margin-bottom: 5px;'>🎫 Quantidade de Vendas</p>
+            <p style='font-size: 24px; font-weight: bold; margin: 0;'>
+                {qtd_vendas:,}
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
+
+            
 # Exibindo os dois primeiros gráficos em colunas se estiverem habilitados
 if mostrar_ranking or mostrar_vendas:
     col1, col2 = st.columns(2)
@@ -134,5 +192,6 @@ if mostrar_ranking or mostrar_vendas:
 # Exibindo o gráfico de repasses condicionalmente
 if mostrar_repasses:
     st.plotly_chart(fig_repasses, use_container_width=True)
+
 
 
