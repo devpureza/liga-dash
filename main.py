@@ -7,7 +7,7 @@ from src.sidebar import filtros_sidebar
 st.set_page_config(page_title="Liga - Dashboard de eventos", page_icon=":books:", layout="wide")
 
 # Converte arquivo excel em csv e le o arquivo csv
-df_excel = pd.read_excel("intermed19022025.xlsx")
+df_excel = pd.read_excel("intermed2002.xlsx")
 df_excel.to_csv("infos_filtradas.csv", index=False)
 csv = pd.read_csv("infos_filtradas.csv")
 
